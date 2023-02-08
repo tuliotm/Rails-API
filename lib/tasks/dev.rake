@@ -1,6 +1,8 @@
 namespace :dev do
   desc "Configs the development environment"
   task setup: :environment do
+    puts "Reseting the databse..."
+    %x(rails db:drop db:create db:migrate)
 
     puts "Registering the types of contacts..."
 
@@ -25,6 +27,30 @@ namespace :dev do
     end
 
     puts "Contacts successfully registered!"
+
+    puts "Registering the telephones of the contacts..."
+    
+    Contact.all.each do |contact|
+      Random.rand(5).times do |i|
+        phone = Phone.create!(number:Faker::PhoneNumber.cell_phone)
+        contact.phones << phone
+        contact.save!
+      end
+    end
+
+    puts "Telephones successfully registered!"
+
+    puts "Registering the address of the contacts..."
+    
+    Contact.all.each do |contact|
+      Address.create!(
+        street: Faker::Address.street_address,
+        city: Faker::Address.city,
+        contact: contact
+      )
+    end
+
+    puts "Address successfully registered!"
 
   end
 

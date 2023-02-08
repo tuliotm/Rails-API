@@ -15,7 +15,7 @@ class ContactsController < ApplicationController
 
   # GET /contacts/1
   def show
-    render json: @contact.attributes.merge({author: "Tulio Manso"})
+    render json: @contact, include: [:kind, :phones] #.attributes.merge({author: "Tulio Manso"}) (we dont need this anymore, we already have the new "as_json" method)
   end
 
   # POST /contacts
@@ -23,7 +23,7 @@ class ContactsController < ApplicationController
     @contact = Contact.new(contact_params)
 
     if @contact.save
-      render json: @contact, status: :created, location: @contact
+      render json: @contact, include: [:kind, :phones], status: :created, location: @contact
     else
       render json: @contact.errors, status: :unprocessable_entity
     end
@@ -51,6 +51,7 @@ class ContactsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def contact_params
-      params.require(:contact).permit(:name, :email, :birthdate)
+      params.require(:contact).permit(:name, :email, :birthdate, :kind_id,
+        phones_attributes: [:id, :number, :_destroy]) # The active record requests the "_attributes" (because the "accepts_nested_attributes_for") to work.
     end
 end
