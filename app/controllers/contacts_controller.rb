@@ -5,12 +5,17 @@ class ContactsController < ApplicationController
   def index
     @contacts = Contact.all
 
+    # render json: @contacts, methods: :author, root: true
+    # It could be used this way ".map {|contact| contact.attributes.merge({author: "Tulio Manso"})}", 
+    # but its better with method: :method, where you can find this method in the model "contact.rb"
+
+    # In the end, we created a replacement method for "as_json" in the model "contact", because it will serve to all actions
     render json: @contacts
   end
 
   # GET /contacts/1
   def show
-    render json: @contact
+    render json: @contact.attributes.merge({author: "Tulio Manso"})
   end
 
   # POST /contacts
